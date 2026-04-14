@@ -51,7 +51,12 @@ class ProjectDatabase:
                     FOREIGN KEY (section_title) REFERENCES sections(title) ON DELETE CASCADE
                 );
 
-                DROP TABLE IF EXISTS word_metadata;
+                CREATE TABLE IF NOT EXISTS word_metadata (
+                    word TEXT PRIMARY KEY,
+                    translation TEXT NOT NULL,
+                    ipa TEXT NOT NULL,
+                    audio_url TEXT NOT NULL
+                );
                 """
             )
 
@@ -158,22 +163,50 @@ class SectionRepository:
 
 
 class MetadataCacheRepository:
-    """
-    Mantido apenas por compatibilidade com arquivos antigos do projeto.
-    Nesta versao, metadados de traducao, IPA e audio nao sao mais usados.
-    """
-
     def __init__(self, database_path: Path = DATABASE_FILE) -> None:
         self.database = ProjectDatabase(database_path)
         self.database_path = database_path
         self._remove_legacy_metadata_file_if_needed()
 
     def load_cache(self) -> dict[str, dict[str, str]]:
-        return {}
+        with self.database.session() as connection:
+            rows = connection.execute(
+                """
+                SELECT word, translation, ipa, audio_url
+                FROM word_metadata
+                ORDER BY word
+                """
+            ).fetchall()
+
+        cache: dict[str, dict[str, str]] = {}
+
+        for word, translation, ipa, audio_url in rows:
+            cache[str(word)] = {
+                "translation": str(translation),
+                "ipa": str(ipa),
+                "audio_url": str(audio_url),
+            }
+
+        return cache
 
     def save_cache(self, cache: dict[str, dict[str, str]]) -> None:
         with self.database.session() as connection:
-            connection.execute("DROP TABLE IF EXISTS word_metadata")
+            connection.execute("DELETE FROM word_metadata")
+
+            for word in sorted(cache, key=str.casefold):
+                metadata = cache[word]
+                connection.execute(
+                    """
+                    INSERT OR REPLACE INTO word_metadata (word, translation, ipa, audio_url)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (
+                        word,
+                        metadata.get("translation", ""),
+                        metadata.get("ipa", ""),
+                        metadata.get("audio_url", ""),
+                    ),
+                )
 
     def _remove_legacy_metadata_file_if_needed(self) -> None:
         if LEGACY_METADATA_FILE.exists():
@@ -181,6 +214,3 @@ class MetadataCacheRepository:
                 LEGACY_METADATA_FILE.unlink()
             except OSError:
                 pass
-
-        with self.database.session() as connection:
-            connection.execute("DROP TABLE IF EXISTS word_metadata")

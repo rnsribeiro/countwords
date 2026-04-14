@@ -1,30 +1,32 @@
-# Contador de Palavras
+# CountWords
 
-Aplicacao em Python com interface grafica feita em `PySide6` para:
+Aplicacao desktop em Python com interface grafica em `PySide6` para contar palavras por seccoes, visualizar histogramas e manter os dados em um banco SQLite local.
 
-- Criar secoes com o titulo de livros, capitulos ou qualquer agrupamento.
-- Adicionar varios blocos de texto a cada secao ao longo do tempo.
-- Persistir apenas as palavras e suas contagens por secao.
-- Visualizar o histograma de uma secao, de varias secoes juntas ou de todas.
-- Exibir, ao lado de cada palavra, uma traducao sugerida para portugues e uma pronuncia em IPA.
-- Abrir o histograma em uma janela dedicada para enxergar melhor as barras.
-- Filtrar e ordenar diretamente dentro da janela detalhada do histograma.
-- Reproduzir audio de pronuncia quando a fonte lexical disponibilizar o arquivo.
-- Excluir uma secao inteira ou remover uma palavra especifica da secao atual.
-- Ordenar por ordem alfabetica ou por quantidade.
-- Pesquisar palavras especificas.
+## O que a aplicacao faz
 
-## Como instalar
+- Cria seccoes com o nome de livros, capitulos ou qualquer outro agrupamento.
+- Permite adicionar varios blocos de texto na mesma seccao ao longo do tempo.
+- Conta palavras de forma case-insensitive.
+- Exibe o histograma de uma seccao, de varias seccoes selecionadas ou de todas juntas.
+- Abre o histograma em uma janela dedicada para facilitar a visualizacao.
+- Permite pesquisar palavras e ordenar por quantidade ou ordem alfabetica.
+- Permite excluir uma seccao inteira.
+- Permite excluir uma palavra da seccao selecionada diretamente na janela do histograma.
 
-1. Tenha o Python 3 instalado.
-2. Abra um terminal na pasta do projeto.
-3. Instale a dependencia:
+## Requisitos
+
+- Python 3.11 ou superior.
+- Dependencias listadas em `requirements.txt`.
+
+## Instalacao
+
+No terminal, dentro da pasta do projeto:
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-## Como executar
+## Execucao
 
 ```powershell
 python app.py
@@ -32,44 +34,31 @@ python app.py
 
 ## Como usar
 
-1. Digite o titulo da secao e clique em **Criar secao**.
-2. Escolha a secao de destino.
-3. Cole um texto e clique em **Adicionar texto a secao** ou use `Ctrl+Enter`.
-4. Marque uma ou mais secoes para visualizar o histograma combinado.
-5. Se nenhuma secao estiver marcada, a aplicacao mostra o histograma de todas juntas.
-6. Use a busca e a ordenacao para filtrar os resultados.
-7. A traducao sugerida e o IPA sao buscados automaticamente para as palavras visiveis.
-8. Use **Abrir histograma em janela** para ver as barras com mais espaco.
-9. Dentro da janela detalhada, use os filtros locais para pesquisar palavras e ordenar o histograma.
-10. Quando houver audio disponivel, use o botao **Ouvir** na linha da palavra.
-11. Use **Excluir secao selecionada** para apagar a secao atual.
-12. Para remover uma unica palavra, selecione a linha na tabela e use **Excluir palavra da linha**.
+1. Digite o titulo da seccao e clique em `Criar seccao`.
+2. Escolha a seccao de destino.
+3. Cole um texto e clique em `Adicionar texto a seccao`.
+4. Marque uma ou mais seccoes para combinar os histogramas.
+5. Se nenhuma seccao estiver marcada, a aplicacao usa todas as seccoes.
+6. Clique em `Abrir histograma em janela` para ver a tabela detalhada.
+7. Na janela do histograma, use a busca e a ordenacao para filtrar os resultados.
+8. Use o botao `Excluir` na linha de uma palavra para removela da seccao atual.
 
 ## Persistencia
 
-- O arquivo `countwords.db` e criado automaticamente na pasta do projeto.
-- Esse banco SQLite guarda as secoes, as contagens por palavra, as traducoes sugeridas e os IPAs em um unico arquivo.
-- O texto bruto inserido na interface nao fica armazenado.
-- Como o banco fica dentro do repositorio, voce pode versiona-lo no GitHub junto com o codigo.
-- Se voce clonar o repositorio em outra maquina e esse arquivo estiver commitado, a aplicacao abre com os dados intactos.
+- O arquivo `countwords.db` fica na raiz do projeto.
+- O banco guarda as seccoes e as contagens por palavra.
+- O texto original digitado nao e armazenado.
+- Como o banco esta dentro do repositorio, voce pode versiona-lo no GitHub junto com o codigo.
+- Ao clonar o repositorio em outra maquina, os dados permanecem intactos desde que `countwords.db` tenha sido commitado.
 
-## Traducao e IPA
+## Estrutura do projeto
 
-- A implementacao atual assume que as palavras analisadas estao em ingles.
-- A traducao mostrada e uma sugestao automatica palavra a palavra para portugues.
-- O IPA e preenchido quando a consulta fonetica encontra um resultado disponivel.
-- O audio de pronuncia aparece quando a API consultada fornece um arquivo de audio para a palavra.
-- Se a rede estiver indisponivel, a contagem continua funcionando e as colunas de traducao e IPA podem ficar vazias ou com placeholder.
+- `app.py`: interface principal e janela detalhada do histograma.
+- `storage_db.py`: camada de persistencia SQLite.
+- `test_app.py`: testes automatizados da logica principal.
+- `countwords.db`: banco local com os dados do projeto.
 
-## GitHub
+## Observacoes
 
-- O projeto esta preparado para manter o banco `countwords.db` dentro da pasta principal.
-- Ao publicar no GitHub, inclua esse arquivo no commit para levar os dados junto com o projeto.
-- Se existirem arquivos legados `section_counts.json` ou `word_metadata_cache.json`, a aplicacao consegue migrar esses dados para o banco SQLite automaticamente.
-
-## Regras da contagem
-
-- A contagem nao diferencia maiusculas de minusculas.
-- Palavras com acentos sao reconhecidas.
-- Numeros tambem entram na contagem.
-- Hifens e apostrofos internos sao preservados quando fizerem parte da palavra.
+- O repositorio foi pensado para ser simples de clonar e executar.
+- Se existirem arquivos legados de versoes anteriores, a aplicacao tenta migrar os dados automaticamente para o SQLite.
