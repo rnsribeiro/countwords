@@ -32,6 +32,12 @@ pip install -r requirements.txt
 python app.py
 ```
 
+Para abrir sem janela de terminal no Windows, basta dar duplo clique em `CountWords.pyw` ou executar:
+
+```powershell
+pythonw CountWords.pyw
+```
+
 ## Como usar
 
 1. Digite o titulo da seccao e clique em `Criar seccao`.
@@ -54,6 +60,7 @@ python app.py
 ## Estrutura do projeto
 
 - `app.py`: interface principal e janela detalhada do histograma.
+- `CountWords.pyw`: launcher para abrir a interface sem terminal no Windows.
 - `storage_db.py`: camada de persistencia SQLite.
 - `test_app.py`: testes automatizados da logica principal.
 - `countwords.db`: banco local com os dados do projeto.
